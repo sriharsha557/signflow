@@ -1,5 +1,7 @@
 'use strict';
 
+// Matched by plain substring against the raw line, so an unrelated comment
+// that merely mentions this string would also suppress that line.
 const IGNORE = 'ui-check-ignore';
 const RADIUS_ALLOWED = new Set(['var(--r)', 'var(--r-pill)', '0', '50%']);
 const HEX = /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![-\w])/g;
@@ -45,6 +47,7 @@ function noBackdropFilter(file, src) {
 function noHoverTranslate(file, src) {
   const out = [];
   const css = stripComments(src);
+  const rawLines = src.split(/\r?\n/);
   const block = /([^{}]+)\{([^{}]*)\}/g;
   let m;
   while ((m = block.exec(css)) !== null) {
@@ -52,10 +55,11 @@ function noHoverTranslate(file, src) {
     if (!/:hover/.test(selector)) continue;
     if (!/translate/.test(body)) continue;
     // stripComments is length-preserving, so m.index in `css` maps to the
-    // same offset in the original `src`; check the ignore marker there
-    // since a comment-embedded marker would be blanked out in `css`.
-    if (src.slice(m.index, m.index + m[0].length).includes(IGNORE)) continue;
+    // same offset/line in the original `src`. The marker check reads the
+    // RAW line the match starts on (not just the matched span) so a
+    // trailing same-line comment after the closing brace is still seen.
     const line = css.slice(0, m.index).split(/\r?\n/).length;
+    if (rawLines[line - 1].includes(IGNORE)) continue;
     out.push({ rule: 'no-hover-translate', file, line, text: selector.trim().slice(0, 120) });
   }
   return out;

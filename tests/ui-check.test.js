@@ -65,3 +65,17 @@ test('ui-check-ignore suppresses a line', () => {
   const src = '.a { background: linear-gradient(red, blue); } /* ui-check-ignore */';
   assert.equal(scan.noGradients('x.css', src).length, 0);
 });
+
+test('radiusTokensOnly: trailing same-line ui-check-ignore comment suppresses the finding', () => {
+  const ignored = '.a { border-radius: 12px; } /* ui-check-ignore */';
+  const notIgnored = '.a { border-radius: 12px; }';
+  assert.equal(scan.radiusTokensOnly('x.css', ignored).length, 0);
+  assert.equal(scan.radiusTokensOnly('x.css', notIgnored).length, 1);
+});
+
+test('noHoverTranslate: trailing same-line ui-check-ignore comment suppresses the finding', () => {
+  const ignored = '.a:hover { transform: translateY(-2px); } /* ui-check-ignore */';
+  const notIgnored = '.a:hover { transform: translateY(-2px); }';
+  assert.equal(scan.noHoverTranslate('x.css', ignored).length, 0);
+  assert.equal(scan.noHoverTranslate('x.css', notIgnored).length, 1);
+});
