@@ -1,0 +1,56 @@
+# Production stack: SignFlow behind Caddy, which gets and renews HTTPS certificates automatically.
+#   1. Point your domain's DNS A record at this server.
+#   2. cp .env.example .env  and fill in DOMAIN, ACME_EMAIL and MASTER_KEY  (or run deploy/install-ubuntu.sh)
+#   3. docker compose up -d --build
+services:
+  signflow:
+    build: .
+    image: signflow:latest
+    container_name: signflow
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      BACKUP_DIR: /backups
+      PORT: "3000"
+      TRUST_PROXY: "1"
+    volumes:
+      - signflow-data:/data
+      - ./backups:/backups
+    expose:
+      - "3000"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+  caddy:
+    image: caddy:2
+    container_name: signflow-caddy
+    restart: unless-stopped
+    depends_on:
+      signflow:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+volumes:
+  signflow-data:
+  caddy-data:
+  caddy-config:

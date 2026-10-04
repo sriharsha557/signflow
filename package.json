@@ -1,0 +1,36 @@
+{
+  "name": "signflow",
+  "version": "1.0.0",
+  "description": "Self-hosted e-signature platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "backup": "node scripts/backup.js",
+    "restore": "node scripts/restore.js",
+    "admin": "node scripts/admin.js"
+  },
+  "dependencies": {
+    "@fontsource/caveat": "^5.3.0",
+    "@fontsource/dancing-script": "^5.3.0",
+    "@fontsource/great-vibes": "^5.3.0",
+    "@fontsource/homemade-apple": "^5.3.0",
+    "@signpdf/placeholder-pdf-lib": "^3.3.0",
+    "@signpdf/signer-p12": "^3.3.0",
+    "@signpdf/signpdf": "^3.3.0",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.2.1",
+    "multer": "^2.4.0",
+    "node-forge": "^1.4.0",
+    "nodemailer": "^10.0.14",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.4.299",
+    "qrcode": "^1.5.4"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "private": true,
+  "license": "UNLICENSED"
+}

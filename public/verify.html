@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" data-theme="ocean">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify a signed document</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div style="max-width:560px;margin:8vh auto;padding:0 16px">
+  <div class="brand" style="color:var(--text);padding:0 0 18px"><span class="logo" id="logo"></span><span id="bn"></span></div>
+  <div class="card card-b stack">
+    <h1>Verify a signed document</h1>
+    <p class="muted" style="margin:0">Upload a completed PDF to confirm it was signed on this platform and hasn't been altered since. The file is only fingerprinted, not stored.</p>
+    <label class="dropzone" id="dz"><div id="dzi"></div><div style="font-weight:650;margin-top:6px">Drop the signed PDF here or click to choose</div><input type="file" accept=".pdf,application/pdf" hidden id="fi"></label>
+    <div id="out"></div>
+  </div>
+</div>
+<script type="module" src="/js/verify.js"></script>
+</body>
+</html>

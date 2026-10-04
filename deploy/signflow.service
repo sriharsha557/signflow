@@ -1,0 +1,32 @@
+# Run SignFlow without Docker (systemd). Assumes Node.js 22 at /usr/bin/node, code in /opt/signflow,
+# data in /var/lib/signflow and a dedicated "signflow" user:
+#   sudo useradd --system --home /var/lib/signflow --shell /usr/sbin/nologin signflow
+#   sudo mkdir -p /var/lib/signflow && sudo chown signflow: /var/lib/signflow
+#   cd /opt/signflow && sudo npm ci --omit=dev
+#   sudo cp deploy/signflow.service /etc/systemd/system/ && sudo systemctl enable --now signflow
+# Put nginx (deploy/nginx.conf) or Caddy in front for HTTPS.
+[Unit]
+Description=SignFlow e-signature platform
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=signflow
+Group=signflow
+WorkingDirectory=/opt/signflow
+EnvironmentFile=/opt/signflow/.env
+Environment=NODE_ENV=production DATA_DIR=/var/lib/signflow BACKUP_DIR=/var/lib/signflow/backups TRUST_PROXY=loopback
+ExecStart=/usr/bin/node src/server.js
+Restart=always
+RestartSec=3
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/signflow
+CapabilityBoundingSet=
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
