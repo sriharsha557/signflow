@@ -107,7 +107,31 @@ const RULES = [
   { name: 'no-raw-hex-js', test: noRawHexInJs, appliesTo: '.js' },
 ];
 
+/**
+ * Resolve the custom-property cascade for each theme. `:root` declarations
+ * form the base; `[data-theme="x"]` declarations override them.
+ */
+function resolveThemes(css) {
+  const src = stripComments(css);
+  const base = {};
+  const themes = {};
+  const block = /([^{}]+)\{([^{}]*)\}/g;
+  let m;
+  while ((m = block.exec(src)) !== null) {
+    const selector = m[1].trim();
+    const decls = {};
+    for (const d of m[2].matchAll(/(--[\w-]+)\s*:\s*([^;]+)/g)) decls[d[1]] = d[2].trim();
+    if (/(^|,)\s*:root\s*(,|$)/.test(selector)) Object.assign(base, decls);
+    for (const t of selector.matchAll(/\[data-theme="([^"]+)"\]/g)) {
+      themes[t[1]] = Object.assign(themes[t[1]] || {}, decls);
+    }
+  }
+  const out = {};
+  for (const [name, decls] of Object.entries(themes)) out[name] = { ...base, ...decls };
+  return out;
+}
+
 module.exports = {
   stripComments, noGradients, noBackdropFilter, noHoverTranslate,
-  radiusTokensOnly, noFractionalFontSize, noRawHexInJs, RULES,
+  radiusTokensOnly, noFractionalFontSize, noRawHexInJs, resolveThemes, RULES,
 };

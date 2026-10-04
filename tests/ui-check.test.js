@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const scan = require('../scripts/ui-check/scan.js');
+const contrast = require('../scripts/ui-check/contrast.js');
 
 test('stripComments blanks comments but preserves line numbers', () => {
   const src = 'a{}\n/* gradient(\n   still comment */\nb{}';
@@ -78,4 +79,39 @@ test('noHoverTranslate: trailing same-line ui-check-ignore comment suppresses th
   const notIgnored = '.a:hover { transform: translateY(-2px); }';
   assert.equal(scan.noHoverTranslate('x.css', ignored).length, 0);
   assert.equal(scan.noHoverTranslate('x.css', notIgnored).length, 1);
+});
+
+test('parseHex handles 3- and 6-digit forms', () => {
+  assert.deepEqual(contrast.parseHex('#fff'), [255, 255, 255]);
+  assert.deepEqual(contrast.parseHex('#0f172a'), [15, 23, 42]);
+  assert.throws(() => contrast.parseHex('rebeccapurple'));
+});
+
+test('contrastRatio matches known WCAG values', () => {
+  assert.equal(contrast.contrastRatio('#000', '#fff').toFixed(2), '21.00');
+  assert.equal(contrast.contrastRatio('#fff', '#fff').toFixed(2), '1.00');
+  assert.equal(contrast.contrastRatio('#15457e', '#ffffff').toFixed(2), '9.61');
+  assert.equal(contrast.contrastRatio('#3f6fa8', '#ffffff').toFixed(2), '5.18');
+});
+
+test('contrastRatio is symmetric', () => {
+  const a = contrast.contrastRatio('#b4440b', '#fff');
+  const b = contrast.contrastRatio('#fff', '#b4440b');
+  assert.equal(a.toFixed(4), b.toFixed(4));
+});
+
+test('resolveThemes merges :root base with theme overrides', () => {
+  const css = `
+    :root, [data-theme="ocean"] { --primary: #15457e; --surface: #ffffff; --muted: #64748b; }
+    [data-theme="emerald"] { --primary: #046b50; }
+  `;
+  const themes = scan.resolveThemes(css);
+  assert.equal(themes.ocean['--primary'], '#15457e');
+  assert.equal(themes.emerald['--primary'], '#046b50');
+  assert.equal(themes.emerald['--surface'], '#ffffff', 'inherits :root surface');
+});
+
+test('resolveThemes ignores commented-out theme blocks', () => {
+  const themes = scan.resolveThemes('/* [data-theme="ghost"] { --primary: #000; } */');
+  assert.equal(themes.ghost, undefined);
 });

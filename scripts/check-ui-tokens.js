@@ -3,11 +3,39 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { RULES } = require('./ui-check/scan.js');
+const { RULES, resolveThemes } = require('./ui-check/scan.js');
+const { contrastRatio } = require('./ui-check/contrast.js');
 
 const ROOT = path.join(__dirname, '..');
 const BASELINE = path.join(__dirname, 'ui-baseline.json');
 const TARGETS = ['public/css', 'public/js'];
+
+const MIN_RATIO = 4.5;
+const ON_PRIMARY = '#ffffff';
+
+/** Contrast failures across every theme. Non-hex values are skipped. */
+function contrastFailures() {
+  const css = ['public/css/tokens.css', 'public/css/app.css']
+    .map((p) => path.join(ROOT, p))
+    .filter((p) => fs.existsSync(p))
+    .map((p) => fs.readFileSync(p, 'utf8'))
+    .join('\n');
+  const out = [];
+  for (const [theme, tokens] of Object.entries(resolveThemes(css))) {
+    const pairs = [
+      ['primary-on-white', tokens['--primary'], ON_PRIMARY],
+      ['muted-on-surface', tokens['--muted'], tokens['--surface']],
+    ];
+    for (const [label, fg, bg] of pairs) {
+      if (!fg || !bg || !fg.startsWith('#') || !bg.startsWith('#')) continue;
+      const ratio = contrastRatio(fg, bg);
+      if (ratio < MIN_RATIO) {
+        out.push(`${theme}  ${label}  ${fg} on ${bg}  ${ratio.toFixed(2)} < ${MIN_RATIO}`);
+      }
+    }
+  }
+  return out;
+}
 
 function walk(dir) {
   const abs = path.join(ROOT, dir);
@@ -80,5 +108,11 @@ if (stale.length) {
   console.error('\nRun: node scripts/check-ui-tokens.js --write-baseline\n');
 }
 
-if (regressions.length || stale.length) process.exit(1);
-console.log(`ui-check: clean (${findings.length} finding(s), all within baseline).`);
+const contrastBad = contrastFailures();
+if (contrastBad.length) {
+  console.error('\nCONTRAST BELOW WCAG AA:\n');
+  for (const c of contrastBad) console.error(`  ${c}`);
+}
+
+if (regressions.length || stale.length || contrastBad.length) process.exit(1);
+console.log(`ui-check: clean (${findings.length} finding(s), contrast AA across all themes).`);
