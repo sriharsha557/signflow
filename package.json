@@ -5,6 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "test": "node --test \"tests/**/*.test.js\"",
+    "check:ui": "node scripts/check-ui-tokens.js",
     "backup": "node scripts/backup.js",
     "restore": "node scripts/restore.js",
     "admin": "node scripts/admin.js"

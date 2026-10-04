@@ -1,0 +1,28 @@
+{
+  "no-hover-translate": {
+    "public/css/app.css": 1,
+    "public/css/site.css": 1
+  },
+  "radius-token": {
+    "public/css/app.css": 41,
+    "public/css/site.css": 28
+  },
+  "fractional-font-size": {
+    "public/css/app.css": 16,
+    "public/css/site.css": 23
+  },
+  "no-gradient": {
+    "public/css/site.css": 4
+  },
+  "no-backdrop-filter": {
+    "public/css/site.css": 1
+  },
+  "no-raw-hex-js": {
+    "public/js/access-ui.js": 3,
+    "public/js/app.js": 50,
+    "public/js/editor.js": 8,
+    "public/js/saas.js": 6,
+    "public/js/sign.js": 9,
+    "public/js/verify.js": 6
+  }
+}
