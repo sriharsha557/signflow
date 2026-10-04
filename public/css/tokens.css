@@ -67,6 +67,13 @@
   --elev-0: none;
   --elev-1: 0 10px 30px -12px rgba(18, 26, 36, .28);
 
+  /* Functional state cues. Never flattened — these are the only focus/selected indicator. */
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+  --focus-ring-sm: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent);
+
+  /* Sheet-of-paper surfaces: depicts a physical document, part of the design language. */
+  --elev-paper: 0 2px 12px rgba(18, 26, 36, .14);
+
   /* Motion. */
   --dur: 120ms;
   --ease: cubic-bezier(.2, 0, .38, .9);

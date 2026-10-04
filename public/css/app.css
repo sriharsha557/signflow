@@ -76,7 +76,7 @@ input[type=text], input[type=email], input[type=password], input[type=number], i
   width: 100%; height: 38px; padding: 0 11px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); color: var(--text); font: inherit; outline: none; transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 textarea { height: auto; min-height: 90px; padding: 9px 11px; resize: vertical; }
-input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: var(--elev-0); }
+input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: var(--focus-ring); }
 .check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
 .check input { width: 16px; height: 16px; accent-color: var(--primary); }
 
@@ -148,7 +148,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
 .tpl { overflow: hidden; display: flex; flex-direction: column; }
 .tpl .thumb { height: 150px; background: var(--page-bg); display: grid; place-items: center; overflow: hidden; border-bottom: 1px solid var(--border); position: relative; }
-.tpl .thumb canvas { width: 62%; box-shadow: var(--elev-0); margin-top: 26px; background: #fff; }
+.tpl .thumb canvas { width: 62%; box-shadow: var(--elev-paper); margin-top: 26px; background: #fff; }
 .tpl .thumb .cat { position: absolute; top: 10px; left: 10px; }
 .tpl .body { padding: 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
 .tpl .actions { padding: 0 16px 14px; display: flex; gap: 8px; }
@@ -189,7 +189,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 
 /* ============ PDF pages & fields ============ */
 .pages { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 24px 16px 60px; }
-.page { position: relative; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.14); }
+.page { position: relative; background: #fff; box-shadow: var(--elev-paper); }
 .page canvas { display: block; width: 100%; height: auto; }
 .page .layer { position: absolute; inset: 0; }
 .page .pno { position: absolute; top: -18px; right: 0; font-size: 11px; color: var(--muted); }
@@ -241,7 +241,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 .sig-pad { border: 1px dashed var(--border); border-radius: var(--r); background: #fff; touch-action: none; width: 100%; height: 180px; display: block; cursor: crosshair; }
 .font-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .font-opts button { height: 64px; border: 1px solid var(--border); border-radius: var(--r); background: #fff; font-size: 22px; cursor: pointer; color: #0b1a3b; overflow: hidden; white-space: nowrap; }
-.font-opts button.on { border-color: var(--primary); box-shadow: var(--elev-0); }
+.font-opts button.on { border-color: var(--primary); box-shadow: var(--focus-ring-sm); }
 .center-msg { max-width: 520px; margin: 10vh auto; text-align: center; padding: 30px; }
 .center-msg .big { width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 16px; }
 .center-msg .big svg.i { width: 32px; height: 32px; }
@@ -268,13 +268,13 @@ table.tbl { width: 100%; border-collapse: collapse; }
 @media (max-width: 1100px) {
   .editor { grid-template-columns: 280px 1fr; }
   .editor .side.right { display: none; }
-  .editor.has-sel .side.right { display: flex; position: fixed; right: 0; top: 0; bottom: 0; width: 270px; z-index: 30; box-shadow: var(--elev-0); }
+  .editor.has-sel .side.right { display: flex; position: fixed; right: 0; top: 0; bottom: 0; width: 270px; z-index: 30; box-shadow: var(--elev-1); }
   .dash-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 800px) {
   .shell { grid-template-columns: 1fr; }
   .sidebar { position: fixed; left: -260px; width: 250px; z-index: 50; transition: left var(--dur) var(--ease); }
-  .sidebar.open { left: 0; box-shadow: var(--elev-0); }
+  .sidebar.open { left: 0; box-shadow: var(--elev-1); }
   .mobile-bar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
   .topbar, .content { padding-left: 16px; padding-right: 16px; }
   .auth-wrap { grid-template-columns: 1fr; } .auth-art { display: none; } .auth-m { display: grid; }
