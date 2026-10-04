@@ -52,6 +52,8 @@ module.exports = function mountSite(app, { db, getSettings, setSetting, billing,
 <link rel="canonical" href="${esc(base + req.path)}">
 <meta property="og:type" content="website"><meta property="og:title" content="${esc(out.title)}"><meta property="og:description" content="${esc(out.description)}"><meta property="og:url" content="${esc(base + req.path)}"><meta property="og:site_name" content="${esc(c.brand)}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/vendor/fonts/ibm-plex-serif/files/ibm-plex-serif-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/vendor/fonts/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/app.css">
 <link rel="stylesheet" href="/css/site.css">
 </head>
