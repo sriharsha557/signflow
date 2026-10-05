@@ -155,7 +155,7 @@ function authPage(kind) {
   app.innerHTML = `
   <div class="auth-wrap">
     <div class="auth-art">
-      <a class="brand" href="/" style="color:var(--surface);padding:0"><span class="logo" style="background:rgba(255,255,255,.2)">${icon('sign')}</span>${esc(CONFIG.brand_name)}</a>
+      <a class="brand" href="/" style="color:var(--on-primary);padding:0"><span class="logo" style="background:rgba(255,255,255,.2)">${icon('sign')}</span>${esc(CONFIG.brand_name)}</a>
       <div>
         <h1>${reg ? 'Everything you need to get documents signed, the right way.' : 'Welcome back. Your documents are waiting.'}</h1>
         <ul class="auth-feats">${AUTH_FEATURES.map(([i, t, d]) => `<li>${icon(i)}<div><b>${t}</b><span>${d}</span></div></li>`).join('')}</ul>

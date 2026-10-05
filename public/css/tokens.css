@@ -63,6 +63,10 @@
   --ink: #121a24;
   --paper: #fbfaf8;
 
+  /* Foreground for anything on a --primary background. Fixed white: the contrast
+     criterion is defined as accent vs #ffffff, and all 7 accents pass against it. */
+  --on-primary: #ffffff;
+
   /* Elevation. Flat by default; real shadow only for genuinely floating layers. */
   --elev-0: none;
   --elev-1: 0 10px 30px -12px rgba(18, 26, 36, .28);
