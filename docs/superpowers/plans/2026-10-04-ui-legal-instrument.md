@@ -21,6 +21,21 @@
 - **Contrast floor:** every `--primary` used as a button background must reach >= 4.5:1 against `#ffffff`, and `--muted` must reach >= 4.5:1 against `--surface`.
 - **Typefaces:** IBM Plex Serif (display, 600), IBM Plex Sans (UI, 400/500/600), IBM Plex Mono (data, 400/500). Latin subset only. Serif is restricted to `h1`, marketing heroes, signing/verify headings, and stat numerals — never `h3`/`h4`.
 - **Out of scope:** `src/pdf.js` (PDF certificate) and `src/mail.js` (HTML emails). Do not modify them.
+- **Elevation rule — decoration flattens, function never does (supersedes the "exactly three
+  selectors" wording in Task 4 Step 7).** `box-shadow` falls into three categories and only the
+  first is flattened to `--elev-0`:
+  1. **Decorative elevation** — flatten to `var(--elev-0)`. Cards, stats, panels, tables.
+  2. **Functional state cues** — keep. A shadow that is the *only* indicator of focus, selection,
+     or active state must never become `none`, and a shadow a keyframe animates must never be
+     zeroed (that silently turns the animation into a no-op). Sanctioned: `input:focus` /
+     `select:focus` / `textarea:focus` and `.font-opts button.on` (tokenised as `--focus-ring`
+     and `--focus-ring-sm`); `.editor .fld.sel`, `.recip.active`, and `.sign .fld.focus` with its
+     `@keyframes pulse` (these carry a per-recipient `var(--c)` colour, so they stay literal).
+  3. **Genuinely floating layers** — keep at `var(--elev-1)`. `.modal`, `.toast`, dropdowns, and
+     the mobile drawers `.sidebar.open` and `.editor.has-sel .side.right`.
+
+  Sheet-of-paper surfaces (`.page`, `.tpl .thumb canvas`) use a dedicated `--elev-paper` token:
+  they depict a physical document and are part of the design language, not decoration.
 - **Baseline tightening protocol (binds every task that touches `scripts/ui-baseline.json`).**
   Always run `npm run check:ui` **before** `--write-baseline`, and read its output.
   It is only safe to regenerate the baseline when the output contains a
