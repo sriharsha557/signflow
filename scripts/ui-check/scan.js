@@ -80,8 +80,25 @@ function radiusTokensOnly(file, src) {
   return out;
 }
 
+/**
+ * Flag a fractional size in either the `font-size:` longhand or hidden
+ * inside a `font:` shorthand value (e.g. `font: 700 11.5px sans-serif;`).
+ * The shorthand branch requires `font` to be followed by optional
+ * whitespace then a colon, so it cannot match `font-family:`,
+ * `font-weight:`, `font-variant-numeric:` or any other `font-*` longhand
+ * (those have a `-` immediately after `font`, not whitespace/colon).
+ * It also requires a unit suffix on the fractional number so plain
+ * `border: 1.5px ...` (a different property entirely) never matches, and
+ * `font: inherit;` / `font: 600 14px ...` (whole-number size) are left
+ * alone since there's no fractional-number-with-unit in their value.
+ */
 function noFractionalFontSize(file, src) {
-  return lineRule('fractional-font-size', /font-size\s*:\s*\d+\.\d+/, file, src);
+  return lineRule(
+    'fractional-font-size',
+    /font-size\s*:\s*\d+\.\d+|\bfont\s*:\s*[^;}]*\d+\.\d+(?:px|pt|em|rem|%)/,
+    file,
+    src
+  );
 }
 
 /**

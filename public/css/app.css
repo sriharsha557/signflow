@@ -5,7 +5,7 @@
   --primary: #15457e; --primary-hover: #0f3561; --primary-soft: #eff6ff; --primary-text: #1e40af;
   --bg: var(--paper); --surface: #ffffff; --surface-2: #f8fafc; --text: var(--ink); --muted: #64748b; --border: #e2e8f0;
   --sidebar: #0f172a; --sidebar-text: #cbd5e1; --sidebar-active: #1e293b; --sidebar-accent: #60a5fa;
-  --page-bg: #e9edf3; --shadow: 0 1px 2px rgba(15,23,42,.06), 0 4px 16px rgba(15,23,42,.06);
+  --page-bg: #e9edf3;
 }
 [data-theme="emerald"] {
   --primary: #046b50; --primary-hover: #03523d; --primary-soft: #ecfdf5; --primary-text: #065f46;
@@ -31,7 +31,7 @@
   --primary: #3f6fa8; --primary-hover: #4e82bd; --primary-soft: #1e1b4b; --primary-text: #c7d2fe;
   --bg: #0b0f1a; --surface: #131a2a; --surface-2: #182033; --text: #e5e7eb; --muted: #94a3b8; --border: #253047;
   --sidebar: #080b14; --sidebar-text: #a5b4cf; --sidebar-active: #172036; --sidebar-accent: #818cf8;
-  --page-bg: #070a12; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+  --page-bg: #070a12;
 }
 
 /* ============ Base ============ */
@@ -312,7 +312,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 .jchip svg.i { width: 13px; height: 13px; }
 .jgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
 .jcard { padding: 16px; display: grid; gap: 6px; align-content: start; }
-.jcode { font: 700 11.5px ui-monospace, monospace; padding: 3px 6px; border-radius: var(--r); background: var(--primary); color: #fff; }
+.jcode { font-family: var(--font-data); font-size: var(--t-xs); font-weight: 700; padding: 3px 6px; border-radius: var(--r); background: var(--primary); color: #fff; }
 .btn.primary.blocked { opacity: .6; }
 .gate { max-width: 460px; display: grid; gap: 14px; }
 .logo-sq { width: 40px; height: 40px; border-radius: var(--r); background: var(--primary); color: #fff; display: grid; place-items: center; }

@@ -55,6 +55,26 @@ test('noFractionalFontSize flags 12.5px but not 12px', () => {
   assert.equal(scan.noFractionalFontSize('x.css', '.a { font-size: 12px; }').length, 0);
 });
 
+test('noFractionalFontSize flags a fractional size hidden in a font: shorthand', () => {
+  assert.equal(scan.noFractionalFontSize('x.css', '.a { font: 700 11.5px ui-monospace, monospace; }').length, 1);
+});
+
+test('noFractionalFontSize does not flag a whole-number size in a font: shorthand', () => {
+  assert.equal(scan.noFractionalFontSize('x.css', '.a { font: 600 14px ui-monospace, monospace; }').length, 0);
+});
+
+test('noFractionalFontSize does not flag font: inherit', () => {
+  assert.equal(scan.noFractionalFontSize('x.css', '.a { font: inherit; }').length, 0);
+});
+
+test('noFractionalFontSize does not flag a fractional border width', () => {
+  assert.equal(scan.noFractionalFontSize('x.css', '.a { border: 1.5px solid red; }').length, 0);
+});
+
+test('noFractionalFontSize still flags the font-size longhand', () => {
+  assert.equal(scan.noFractionalFontSize('x.css', '.a { font-size: 12.5px; }').length, 1);
+});
+
 test('noRawHexInJs flags colours but not DOM id selectors', () => {
   assert.equal(scan.noRawHexInJs('x.js', "el.style.color = '#0f172a';").length, 1);
   assert.equal(scan.noRawHexInJs('x.js', "el.style.color = '#fff';").length, 1);
