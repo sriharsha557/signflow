@@ -45,7 +45,7 @@ async function usersTab(box, me) {
       <td><b>${esc(u.name)}</b>${u.id === me.id ? ' <span class="chip">you</span>' : ''}<div class="small muted">${esc(u.email)}</div></td>
       <td>${manage && u.role.key !== 'owner' && u.id !== me.id ? `<select data-role="${u.id}" style="height:32px;width:auto">${assignable.map((r) => `<option value="${r.id}" ${r.id === u.role.id ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select>` : `<span class="chip">${esc(u.role.name)}</span>`}</td>
       <td>${statusBadge(u.status)}</td>
-      <td class="hide-m">${u.totp_enabled ? `<span style="color:#15803d">${icon('check')}</span>` : '<span class="small muted">Off</span>'}</td>
+      <td class="hide-m">${u.totp_enabled ? `<span style="color:var(--ok)">${icon('check')}</span>` : '<span class="small muted">Off</span>'}</td>
       <td class="hide-m small">${u.last_login_at ? `${timeAgo(u.last_login_at)}<div class="muted">${esc(u.last_login_ip || '')}</div>` : '<span class="muted">Never</span>'}</td>
       ${manage ? `<td>${u.role.key === 'owner' || u.id === me.id ? '' : `<button class="btn sm" data-menu="${u.id}">Manage</button>`}</td>` : ''}</tr>`).join('');
     box.querySelectorAll('[data-role]').forEach((sel) => (sel.onchange = async () => {
@@ -58,7 +58,7 @@ async function usersTab(box, me) {
   };
   draw();
   box.querySelector('#uq').oninput = (e) => draw(e.target.value);
-  box.querySelector('#add')?.addEventListener('click', () => {
+  box.querySelector('#add')?.addEventListener('click', () => { // ui-check-ignore: DOM id selector, not a colour literal
     const m = modal(`<div class="mh"><h2>Invite a user</h2></div><form class="mb stack" id="f">
       <label class="field"><span>Full name</span><input type="text" name="name" required></label>
       <label class="field"><span>Work email</span><input type="email" name="email" required></label>
@@ -207,7 +207,7 @@ async function setup2fa(done) {
   try { s = await api('/api/account/2fa/setup', { method: 'POST' }); } catch (e) { return toast(e.message, true); }
   const m = modal(`<div class="mh"><h2>Set up two-factor authentication</h2></div><form class="mb stack" id="f">
     <ol class="small" style="margin:0;padding-left:18px;line-height:1.7"><li>Open your authenticator app and add an account.</li><li>Scan this QR code, or type the key.</li><li>Enter the 6-digit code it shows.</li></ol>
-    <div class="row wrap" style="gap:18px;align-items:center"><img src="${s.qr}" alt="QR code for your authenticator app" width="180" height="180" style="border-radius:8px;border:1px solid var(--border);background:#fff">
+    <div class="row wrap" style="gap:18px;align-items:center"><img src="${s.qr}" alt="QR code for your authenticator app" width="180" height="180" style="border-radius:8px;border:1px solid var(--border);background:#fff"> <!-- ui-check-ignore: QR quiet-zone must stay literal white for scanner contrast regardless of theme -->
       <div class="stack" style="flex:1;min-width:180px"><div class="small muted">Setup key</div><code class="mono" style="font-size:14px">${esc(s.secret)}</code></div></div>
     <label class="field"><span>6-digit code</span><input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required></label>
     <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Turn on</button></div></form>`);

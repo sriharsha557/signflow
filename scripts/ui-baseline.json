@@ -15,7 +15,6 @@
     "public/css/site.css": 23
   },
   "no-raw-hex-js": {
-    "public/js/access-ui.js": 3,
     "public/js/sign.js": 9,
     "public/js/verify.js": 6
   }
