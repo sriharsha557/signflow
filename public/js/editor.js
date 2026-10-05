@@ -1,7 +1,7 @@
 import { api, esc, icon, toast, FIELD_TYPES, renderPdf, confirmBox } from './common.js';
 import { complianceEditor } from './compliance-ui.js';
 
-const COLORS = ['#2563eb', '#db2777', '#059669', '#d97706', '#7c3aed', '#0891b2', '#dc2626', '#4d7c0f'];
+const COLORS = ['var(--rc-1)', 'var(--rc-2)', 'var(--rc-3)', 'var(--rc-4)', 'var(--rc-5)', 'var(--rc-6)'];
 
 /**
  * Field-placement editor shared by documents and templates.
