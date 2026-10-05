@@ -202,12 +202,15 @@ const browserName = (ua = '') => {
   const os = /Windows/.test(ua) ? 'Windows' : /Mac OS X/.test(ua) ? 'macOS' : /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iOS' : /Linux/.test(ua) ? 'Linux' : '';
   return os ? `${b} on ${os}` : b;
 };
+// QR quiet zone must stay literal white for scanner contrast in every theme;
+// var(--surface) is dark under Midnight and would break scanning.
+const qrStyle = 'border-radius:var(--r);border:1px solid var(--border);background:#fff'; // ui-check-ignore
 async function setup2fa(done) {
   let s;
   try { s = await api('/api/account/2fa/setup', { method: 'POST' }); } catch (e) { return toast(e.message, true); }
   const m = modal(`<div class="mh"><h2>Set up two-factor authentication</h2></div><form class="mb stack" id="f">
     <ol class="small" style="margin:0;padding-left:18px;line-height:1.7"><li>Open your authenticator app and add an account.</li><li>Scan this QR code, or type the key.</li><li>Enter the 6-digit code it shows.</li></ol>
-    <div class="row wrap" style="gap:18px;align-items:center"><img src="${s.qr}" alt="QR code for your authenticator app" width="180" height="180" style="border-radius:8px;border:1px solid var(--border);background:#fff"> <!-- ui-check-ignore: QR quiet-zone must stay literal white for scanner contrast regardless of theme -->
+    <div class="row wrap" style="gap:18px;align-items:center"><img src="${s.qr}" alt="QR code for your authenticator app" width="180" height="180" style="${qrStyle}">
       <div class="stack" style="flex:1;min-width:180px"><div class="small muted">Setup key</div><code class="mono" style="font-size:14px">${esc(s.secret)}</code></div></div>
     <label class="field"><span>6-digit code</span><input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required></label>
     <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Turn on</button></div></form>`);
