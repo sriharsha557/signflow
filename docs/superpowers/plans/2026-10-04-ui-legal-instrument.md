@@ -1160,20 +1160,17 @@ One commit per file keeps any visual regression bisectable to a single surface.
 
 - [ ] **Step 3: Note the editor's field colours**
 
-`public/js/editor.js` assigns per-recipient field colours through the `--c` custom property consumed by `.fld` in `app.css:~270`. These are **data**, not theme styling — they must stay visually distinct per recipient. Move the palette into `tokens.css` as a numbered set rather than inlining hex in JS:
+`public/js/editor.js` assigns per-recipient field colours through the `--c` custom property consumed by `.fld` in `app.css`. These are **data, not styling, and they must stay literal hex.**
 
-```css
-:root {
-  --rc-1: #15457e;
-  --rc-2: #046b50;
-  --rc-3: #b4440b;
-  --rc-4: #512aa8;
-  --rc-5: #a81436;
-  --rc-6: #0e7490;
-}
+**Do NOT move this palette into CSS tokens.** The assigned colour is POSTed to the server, persisted in the `recipients.color` and `template_roles.color` TEXT columns, and then read back by `hexToRgb()` in `src/pdf.js`, which regex-matches a hex colour and **silently falls back to one default blue when it does not match**. Storing `var(--rc-N)` therefore collapses every recipient's field colour to the same blue in the generated signed PDF, with no error raised. A CSS custom property cannot cross into server-side PDF rendering.
+
+Instead, keep a literal hex array in `editor.js`, marked `// ui-check-ignore` with the justification that it is a persisted data value rather than styling, and **align it with the server's own palette** in `src/builtin-templates.js`, which is the fallback used when a client does not supply a colour. Both must hold the same six values:
+
+```js
+const COLORS = ['#15457e', '#046b50', '#b4440b', '#512aa8', '#a81436', '#0e7490']; // ui-check-ignore
 ```
 
-Then in `editor.js`, index into `var(--rc-N)` by recipient position instead of a hex array.
+These six are verified >= 4.5:1 against white (9.61, 6.51, 5.57, 9.35, 7.45, 5.36), which matters because they are drawn onto white PDF paper. The palette they replace in `src/builtin-templates.js` had three failures: `#059669` 3.77, `#d97706` 3.19, `#0891b2` 3.68.
 
 - [ ] **Step 4: Verify the editor still works end to end**
 
