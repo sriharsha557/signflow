@@ -36,6 +36,12 @@
 
   Sheet-of-paper surfaces (`.page`, `.tpl .thumb canvas`) use a dedicated `--elev-paper` token:
   they depict a physical document and are part of the design language, not decoration.
+- **Foreground-on-accent rule.** `--on-primary: #ffffff` is the foreground for anything sitting on a
+  `--primary` background (button labels, the auth-art brand, icons on accent fills). It is a fixed
+  white, not a theme-varying token, because the contrast criterion above is defined as *accent vs
+  `#ffffff`* — every one of the 7 accents was verified >= 4.5:1 against white. Never substitute
+  `var(--surface)` for white text on an accent: under Midnight, `--surface` is `#131a2a`, which gives
+  3.35:1 on `#3f6fa8` and fails AA.
 - **Baseline tightening protocol (binds every task that touches `scripts/ui-baseline.json`).**
   Always run `npm run check:ui` **before** `--write-baseline`, and read its output.
   It is only safe to regenerate the baseline when the output contains a
@@ -1085,7 +1091,8 @@ Run `grep -n "#[0-9a-fA-F]\{3,8\}" public/js/app.js` and replace each colour lit
 |---|---|
 | `#0f172a`, `#121a24` | `var(--ink)` |
 | `#f5f7fb`, `#fbfaf8` | `var(--paper)` |
-| `#fff`, `#ffffff` | `var(--surface)` |
+| `#fff`, `#ffffff` **as a background/surface** | `var(--surface)` |
+| `#fff`, `#ffffff` **as text or an icon sitting ON a `--primary` background** | `var(--on-primary)` |
 | `#64748b`, `#5b6577` | `var(--muted)` |
 | `#e2e8f0`, `#e3e8ef` | `var(--border)` |
 | `#15803d` | `var(--ok)` |
