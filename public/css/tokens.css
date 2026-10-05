@@ -81,15 +81,6 @@
   /* Motion. */
   --dur: 120ms;
   --ease: cubic-bezier(.2, 0, .38, .9);
-
-  /* Per-recipient field colours. Data, not theme styling: each must stay
-     visually distinct. All six verified >= 4.5:1 against white. */
-  --rc-1: #15457e;
-  --rc-2: #046b50;
-  --rc-3: #b4440b;
-  --rc-4: #512aa8;
-  --rc-5: #a81436;
-  --rc-6: #0e7490;
 }
 
 @media (prefers-reduced-motion: reduce) {

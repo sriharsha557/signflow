@@ -1,7 +1,10 @@
 import { api, esc, icon, toast, FIELD_TYPES, renderPdf, confirmBox } from './common.js';
 import { complianceEditor } from './compliance-ui.js';
 
-const COLORS = ['var(--rc-1)', 'var(--rc-2)', 'var(--rc-3)', 'var(--rc-4)', 'var(--rc-5)', 'var(--rc-6)'];
+// Per-recipient field colours. Persisted data, not styling: this value is stored in
+// recipients.color and read by hexToRgb() in src/pdf.js for the signed PDF, so it must
+// be a literal colour. Kept in sync with COLORS in src/builtin-templates.js.
+const COLORS = ['#15457e', '#046b50', '#b4440b', '#512aa8', '#a81436', '#0e7490']; // ui-check-ignore
 
 /**
  * Field-placement editor shared by documents and templates.

@@ -5,7 +5,8 @@ const { buildContractPdf } = require('./pdf');
 const vault = require('./security/vault');
 const { LIBRARY, byKey } = require('./templates-library');
 
-const COLORS = ['#2563eb', '#db2777', '#059669', '#d97706', '#7c3aed', '#0891b2'];
+// Kept in sync with COLORS in public/js/editor.js; AA-verified against white (paper) background.
+const COLORS = ['#15457e', '#046b50', '#b4440b', '#512aa8', '#a81436', '#0e7490'];
 
 for (const col of ['builtin_key TEXT', 'page_count INTEGER', 'org_id INTEGER']) {
   try { db.exec(`ALTER TABLE templates ADD COLUMN ${col}`); } catch (e) { if (!/duplicate column/.test(e.message)) throw e; }
