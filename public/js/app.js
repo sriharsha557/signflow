@@ -40,6 +40,8 @@ function themeSwatch(key) {
     bg: read('--bg'),
     p: read('--primary'),
     t: read('--sidebar-text'),
+    // Relies on every theme block declaring --text/--border itself: an
+    // inherited value here would resolve from the page's active theme.
     text: read('--text'),
     border: read('--border'),
   };
