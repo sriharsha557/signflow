@@ -14,7 +14,7 @@ export function upgradeModal(message) {
 
 function meter(label, used, max) {
   const pct = max < 0 ? 4 : Math.min(100, Math.round((used / Math.max(1, max)) * 100));
-  const col = max >= 0 && used >= max ? '#b91c1c' : pct > 80 ? '#b45309' : 'var(--primary)';
+  const col = max >= 0 && used >= max ? 'var(--bad)' : pct > 80 ? 'var(--warn)' : 'var(--primary)';
   return `<div class="stack" style="gap:6px"><div class="row small"><b>${label}</b><span class="spacer"></span><span class="muted">${used} of ${limit(max)}</span></div>
     <div class="meter"><i style="width:${pct}%;background:${col}"></i></div></div>`;
 }
@@ -44,7 +44,7 @@ export async function billingPage(main, me) {
   const canManage = (me.permissions || []).includes('billing.manage');
   main.innerHTML = `<div class="topbar"><div><h1>Plan & billing</h1><p class="muted" style="margin:4px 0 0">${esc(o.name)}</p></div></div>
   <div class="content stack" style="gap:16px">
-    ${o.testMode ? `<div class="card card-b small" style="border-color:#f59e0b;background:color-mix(in srgb,#f59e0b 10%,var(--surface))">${icon('bell')} <b>Test mode:</b> payments are simulated and no money is charged. The platform owner can connect Razorpay or Stripe in Platform › Payments.</div>` : ''}
+    ${o.testMode ? `<div class="card card-b small" style="border-color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,var(--surface))">${icon('bell')} <b>Test mode:</b> payments are simulated and no money is charged. The platform owner can connect Razorpay or Stripe in Platform › Payments.</div>` : ''}
     <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
       <div class="card card-b stack"><div class="row"><h2 style="flex:1">${esc(o.plan.name)} plan</h2>${statusBadge(o.status)}</div>
         <div class="small muted">${o.comped ? 'Complimentary plan — no billing.' : o.status === 'trialing' ? `${o.trialDaysLeft} day(s) left in your free trial. Choose a plan to keep these features.` : ['expired', 'trial_expired'].includes(o.status) ? 'Your paid features are paused. You are on the Free plan until you renew.' : `Renews or ends on ${fmtDate(o.periodEnd, false)}.`}</div>
@@ -222,7 +222,7 @@ export async function platformPage(main, tab = 'overview') {
 }
 
 // ---------------------------------------------------------------- platform: public website & enquiries
-const LEAD_ST = { new: ['New', 'var(--warn, #b45309)'], contacted: ['Contacted', 'var(--primary)'], won: ['Customer', 'var(--ok, #15803d)'], closed: ['Closed', 'var(--muted)'] };
+const LEAD_ST = { new: ['New', 'var(--warn)'], contacted: ['Contacted', 'var(--primary)'], won: ['Customer', 'var(--ok)'], closed: ['Closed', 'var(--muted)'] };
 async function websiteTab(box) {
   const [cfg, leads] = await Promise.all([api('/api/platform/site'), api('/api/platform/leads')]);
   const newCount = leads.filter((l) => l.status === 'new').length;
