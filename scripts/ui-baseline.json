@@ -16,7 +16,6 @@
   },
   "no-raw-hex-js": {
     "public/js/access-ui.js": 3,
-    "public/js/app.js": 50,
     "public/js/editor.js": 8,
     "public/js/saas.js": 6,
     "public/js/sign.js": 9,

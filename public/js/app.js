@@ -13,14 +13,39 @@ let ME = null;
 let CONFIG = null;
 
 const THEMES = {
-  ocean: { name: 'Ocean', sb: '#0f172a', bg: '#f5f7fb', p: '#2563eb', t: '#cbd5e1' },
-  emerald: { name: 'Emerald', sb: '#052e22', bg: '#f4f8f6', p: '#059669', t: '#bfe3d4' },
-  sunset: { name: 'Sunset', sb: '#ffffff', bg: '#faf6f2', p: '#ea580c', t: '#44403c' },
-  royal: { name: 'Royal', sb: '#1e1038', bg: '#f7f5fc', p: '#7c3aed', t: '#d4c9ee' },
-  rose: { name: 'Rose', sb: '#ffffff', bg: '#fbf6f7', p: '#e11d48', t: '#4c3b40' },
-  graphite: { name: 'Graphite', sb: '#fafafa', bg: '#ffffff', p: '#18181b', t: '#3f3f46' },
-  midnight: { name: 'Midnight (dark)', sb: '#080b14', bg: '#0b0f1a', p: '#6366f1', t: '#a5b4cf' },
+  ocean: { name: 'Ocean' },
+  emerald: { name: 'Emerald' },
+  sunset: { name: 'Sunset' },
+  royal: { name: 'Royal' },
+  rose: { name: 'Rose' },
+  graphite: { name: 'Graphite' },
+  midnight: { name: 'Midnight (dark)' },
 };
+
+/**
+ * Read a theme's swatch colours from CSS rather than duplicating them here.
+ * Renders a detached probe element carrying the theme attribute and asks the
+ * browser for the resolved custom properties, so public/css is the only
+ * place a palette is ever defined.
+ */
+function themeSwatch(key) {
+  const probe = document.createElement('div');
+  probe.dataset.theme = key;
+  probe.style.display = 'none';
+  document.body.appendChild(probe);
+  const cs = getComputedStyle(probe);
+  const read = (name) => cs.getPropertyValue(name).trim();
+  const swatch = {
+    sb: read('--sidebar'),
+    bg: read('--bg'),
+    p: read('--primary'),
+    t: read('--sidebar-text'),
+    text: read('--text'),
+    border: read('--border'),
+  };
+  probe.remove();
+  return swatch;
+}
 
 const go = (h) => { location.hash = h; };
 
@@ -130,7 +155,7 @@ function authPage(kind) {
   app.innerHTML = `
   <div class="auth-wrap">
     <div class="auth-art">
-      <a class="brand" href="/" style="color:#fff;padding:0"><span class="logo" style="background:rgba(255,255,255,.2)">${icon('sign')}</span>${esc(CONFIG.brand_name)}</a>
+      <a class="brand" href="/" style="color:var(--surface);padding:0"><span class="logo" style="background:rgba(255,255,255,.2)">${icon('sign')}</span>${esc(CONFIG.brand_name)}</a>
       <div>
         <h1>${reg ? 'Everything you need to get documents signed, the right way.' : 'Welcome back. Your documents are waiting.'}</h1>
         <ul class="auth-feats">${AUTH_FEATURES.map(([i, t, d]) => `<li>${icon(i)}<div><b>${t}</b><span>${d}</span></div></li>`).join('')}</ul>
@@ -312,7 +337,7 @@ async function documentDetail(main, id) {
           ${d.recipients.map((r) => `<div class="list-item" style="cursor:default"><span class="avatar" style="background:${r.color}">${esc(initials(r.name))}</span>
             <div style="min-width:0;flex:1"><div class="t">${esc(r.name)}</div><div class="small muted" style="overflow:hidden;text-overflow:ellipsis">${esc(r.email)} · ${r.role === 'viewer' ? 'gets a copy' : r.role}</div>
             ${r.signed_at ? `<div class="small muted">${r.status === 'declined' ? 'Declined' : 'Signed'} ${fmtDate(r.signed_at)}</div>` : r.viewed_at ? `<div class="small muted">Viewed ${fmtDate(r.viewed_at)}</div>` : ''}
-            ${r.decline_reason ? `<div class="small" style="color:#b91c1c">“${esc(r.decline_reason)}”</div>` : ''}</div>${r.role === 'viewer' ? '' : badge(r.status)}</div>`).join('')}
+            ${r.decline_reason ? `<div class="small" style="color:var(--bad)">“${esc(r.decline_reason)}”</div>` : ''}</div>${r.role === 'viewer' ? '' : badge(r.status)}</div>`).join('')}
         </div>
         <div class="card"><div class="card-h"><h2>Compliance</h2><span class="spacer"></span>${d.jurisdictions.map((c) => `<span class="chip">${esc(c)}</span>`).join(' ')}</div><div class="card-b stack">
           <div class="small"><span class="muted">Document type:</span> ${esc(SFC().CATEGORIES[d.category]?.label || 'Commercial')} · <span class="muted">Checks:</span> ${d.controls.map((c) => esc(SFC().CONTROLS[c]?.label || c)).join(', ')}</div>
@@ -344,14 +369,14 @@ async function documentDetail(main, id) {
   $('#del')?.addEventListener('click', async () => { if (await confirmBox('Delete document?', 'This permanently deletes the document, its signed copy and audit trail.', 'Delete', true)) { try { await api(`/api/documents/${id}`, { method: 'DELETE' }); toast('Deleted'); go('#/documents'); } catch (e) { toast(e.message, true); } } });
   $('#integ').onclick = async () => {
     const r = await api(`/api/documents/${id}/integrity`);
-    const line = (ok, text) => `<div class="row" style="gap:8px;color:${ok ? 'var(--ok, #15803d)' : '#b91c1c'}">${icon(ok ? 'okcircle' : 'xcircle')}<span>${text}</span></div>`;
+    const line = (ok, text) => `<div class="row" style="gap:8px;color:${ok ? 'var(--ok)' : 'var(--bad)'}">${icon(ok ? 'okcircle' : 'xcircle')}<span>${text}</span></div>`;
     $('#integ-out').innerHTML = `<div class="stack" style="gap:6px">
       ${line(r.chain.valid, r.chain.valid ? `Audit trail intact (${r.chain.entries} chained entries)` : `Audit trail broken at entry ${r.chain.brokenAt}`)}
       ${line(r.encryptedAtRest, r.encryptedAtRest ? 'Original encrypted at rest' : 'Original stored unencrypted (run "Encrypt existing files" in Settings › Security)')}
       ${line(r.original?.ok, r.original?.ok ? 'Original file matches its recorded SHA-256' : r.original?.error || 'Original file does not match its fingerprint')}
       ${r.signed ? line(r.signed.ok, r.signed.ok ? 'Signed PDF matches its recorded SHA-256' : r.signed.error || 'Signed PDF changed') : ''}
       ${r.seal ? `<div class="muted">Seal: ${esc(r.seal.subject)}${r.seal.selfSigned ? ' (self-signed)' : ''}<br><span class="mono">${esc(r.seal.fingerprint)}</span></div>` : ''}
-      <b style="color:${r.ok ? '#15803d' : '#b91c1c'}">${r.ok ? 'All integrity checks passed' : 'Integrity problem found — investigate before relying on this document'}</b></div>`;
+      <b style="color:${r.ok ? 'var(--ok)' : 'var(--bad)'}">${r.ok ? 'All integrity checks passed' : 'Integrity problem found — investigate before relying on this document'}</b></div>`;
   };
   $('#dup')?.addEventListener('click', async () => { const r = await api(`/api/documents/${id}/duplicate`, { method: 'POST' }); toast('Copied to a new draft'); go(`#/documents/${r.id}/edit`); });
   $('#tpl')?.addEventListener('click', () => saveAsTemplateModal(d));
@@ -366,7 +391,7 @@ async function documentDetail(main, id) {
       const r = d.recipients.find((x) => x.id === f.recipient_id);
       const el = document.createElement('div');
       el.className = 'fld';
-      el.style.cssText = `--c:${r?.color || '#2563eb'};left:${f.x * 100}%;top:${f.y * 100}%;width:${f.w * 100}%;height:${f.h * 100}%;${f.value ? 'background:transparent;border-color:transparent;color:#0b1a3b' : ''}`;
+      el.style.cssText = `--c:${r?.color || 'var(--primary)'};left:${f.x * 100}%;top:${f.y * 100}%;width:${f.w * 100}%;height:${f.h * 100}%;${f.value ? 'background:transparent;border-color:transparent;color:var(--ink)' : ''}`;
       el.title = `${FIELD_TYPES[f.type]?.label} — ${r?.name}`;
       el.innerHTML = f.value
         ? (f.value.startsWith('data:image') ? `<img src="${f.value}" style="max-width:100%;max-height:100%">` : `<span class="lbl" style="font-weight:500">${f.type === 'checkbox' ? (f.value === 'true' ? '✔' : '') : esc(f.value)}</span>`)
@@ -533,10 +558,10 @@ async function appearanceTab(pane) {
       <p class="small muted" style="margin:0">Shown in the sidebar, signing pages, emails and the completion certificate.</p>
       <div><button class="btn primary" id="sv">Save</button></div></div></div>
     <div class="card"><div class="card-h"><h2>Theme</h2><span class="spacer"></span><span class="small muted">Applies to the app, signing pages, emails and certificates</span></div><div class="card-b"><div class="themes">
-      ${Object.entries(THEMES).map(([k, t]) => `<div class="theme-card ${s.theme === k ? 'on' : ''}" data-k="${k}">
-        <div class="pv"><div class="sb" style="background:${t.sb};border-right:1px solid rgba(0,0,0,.06)"><i style="background:${t.p};opacity:1;width:70%"></i><i style="background:${t.t}"></i><i style="background:${t.t}"></i><i style="background:${t.t};width:60%"></i></div>
-        <div class="mn" style="background:${t.bg}"><b style="background:${k === 'midnight' ? '#e5e7eb' : '#0f172a'};opacity:.8"></b><i style="background:${t.p};width:40%;height:14px;border-radius:4px"></i><i style="background:${k === 'midnight' ? '#253047' : '#e2e8f0'}"></i><i style="background:${k === 'midnight' ? '#253047' : '#e2e8f0'};width:70%"></i></div></div>
-        <div class="nm">${t.name}<span class="spacer"></span>${s.theme === k ? `<span style="color:var(--primary)">${icon('check')}</span>` : ''}</div></div>`).join('')}
+      ${Object.keys(THEMES).map((k) => { const sw = themeSwatch(k); return `<div class="theme-card ${s.theme === k ? 'on' : ''}" data-k="${k}">
+        <div class="pv"><div class="sb" style="background:${sw.sb};border-right:1px solid rgba(0,0,0,.06)"><i style="background:${sw.p};opacity:1;width:70%"></i><i style="background:${sw.t}"></i><i style="background:${sw.t}"></i><i style="background:${sw.t};width:60%"></i></div>
+        <div class="mn" style="background:${sw.bg}"><b style="background:${sw.text};opacity:.8"></b><i style="background:${sw.p};width:40%;height:14px;border-radius:4px"></i><i style="background:${sw.border}"></i><i style="background:${sw.border};width:70%"></i></div></div>
+        <div class="nm">${THEMES[k].name}<span class="spacer"></span>${s.theme === k ? `<span style="color:var(--primary)">${icon('check')}</span>` : ''}</div></div>`; }).join('')}
     </div></div></div></div>`;
   pane.querySelector('#sv').onclick = async () => { await api('/api/settings', { method: 'PUT', body: { brand_name: pane.querySelector('#bn').value } }); CONFIG = null; toast('Branding saved'); route(); };
   pane.querySelectorAll('.theme-card').forEach((c) => (c.onclick = async () => { await api('/api/settings', { method: 'PUT', body: { theme: c.dataset.k } }); applyTheme(c.dataset.k); CONFIG.theme = c.dataset.k; toast(`${THEMES[c.dataset.k].name} theme applied`); appearanceTab(pane); }));
@@ -562,7 +587,7 @@ async function emailsTab(pane) {
   let lastFocus = $('#body');
   const load = () => { $('#sub').value = cur.subject; $('#body').value = cur.body; $('#btn').value = cur.button || ''; preview(); };
   let t;
-  const preview = () => { clearTimeout(t); t = setTimeout(async () => { const r = await api('/api/email-templates/preview', { method: 'POST', body: { subject: $('#sub').value, body: $('#body').value, button: $('#btn').value } }); $('#pv').srcdoc = `<div style="font:600 14px sans-serif;padding:12px 16px;background:#fff;border-bottom:1px solid #e5e7eb">Subject: ${esc(r.subject)}</div>` + r.html; }, 250); };
+  const preview = () => { clearTimeout(t); t = setTimeout(async () => { const r = await api('/api/email-templates/preview', { method: 'POST', body: { subject: $('#sub').value, body: $('#body').value, button: $('#btn').value } }); $('#pv').srcdoc = `<div style="font:600 14px sans-serif;padding:12px 16px;background:#fff;border-bottom:1px solid #e5e7eb">Subject: ${esc(r.subject)}</div>` + r.html; }, 250); }; // ui-check-ignore: iframe srcdoc is a separate document and cannot resolve var(--token), this mimics fixed email-client chrome
   ['#sub', '#body', '#btn'].forEach((s) => { $(s).oninput = preview; $(s).onfocus = () => (lastFocus = $(s)); });
   $('#k').onchange = (e) => { cur = list.find((x) => x.key === e.target.value); load(); };
   pane.querySelectorAll('[data-p]').forEach((c) => (c.onclick = () => {
@@ -611,7 +636,7 @@ async function outboxTab(pane) {
   const rows = await api('/api/outbox');
   pane.innerHTML = `<div class="card"><div class="card-h"><h2>Outbox</h2><span class="spacer"></span><span class="small muted">Last 100 emails</span></div>
     ${rows.length ? `<table class="tbl"><thead><tr><th>To</th><th>Subject</th><th>Status</th><th class="hide-m">When</th><th></th></tr></thead><tbody>
-    ${rows.map((e) => `<tr style="cursor:default"><td class="small">${esc(e.to_email)}</td><td class="small">${esc(e.subject)}${e.error ? `<div style="color:#b91c1c">${esc(e.error)}</div>` : ''}</td>
+    ${rows.map((e) => `<tr style="cursor:default"><td class="small">${esc(e.to_email)}</td><td class="small">${esc(e.subject)}${e.error ? `<div style="color:var(--bad)">${esc(e.error)}</div>` : ''}</td>
       <td><span class="badge ${e.status === 'sent' ? 'b-completed' : e.status === 'failed' ? 'b-declined' : 'b-pending'}">${e.status === 'logged' ? 'Not delivered (no SMTP)' : e.status}</span></td>
       <td class="hide-m small muted">${timeAgo(e.created_at)}</td>
       <td><div class="row">${e.link ? `<button class="btn sm" data-link="${esc(e.link)}" title="Copy link">${icon('copy')}</button>` : ''}<a class="btn sm" href="/api/outbox/${e.id}" target="_blank" title="View email">${icon('eye')}</a></div></td></tr>`).join('')}</tbody></table>`
@@ -670,12 +695,12 @@ async function securityTab(pane) {
   const p = s.policies;
   pane.innerHTML = `<div class="stack">
     <div class="card"><div class="card-h"><h2>Protection status</h2></div><div class="card-b stack small">
-      <div class="row"><span style="color:#15803d">${icon('okcircle')}</span><div><b>Encryption at rest:</b> ${esc(s.encryption.algorithm)} · key from ${esc(s.encryption.keySource)} · ${s.encryption.encrypted}/${s.encryption.files} files encrypted</div></div>
+      <div class="row"><span style="color:var(--ok)">${icon('okcircle')}</span><div><b>Encryption at rest:</b> ${esc(s.encryption.algorithm)} · key from ${esc(s.encryption.keySource)} · ${s.encryption.encrypted}/${s.encryption.files} files encrypted</div></div>
       ${s.encryption.encrypted < s.encryption.files ? `<div><button class="btn sm" id="enc">${icon('shield')} Encrypt existing files</button></div>` : ''}
-      <div class="row"><span style="color:${s.seal.selfSigned ? '#b45309' : '#15803d'}">${icon(s.seal.selfSigned ? 'bell' : 'okcircle')}</span><div><b>Document seal:</b> ${esc(s.seal.subject)} · ${esc(s.seal.source)} · valid to ${fmtDate(s.seal.validTo, false)}<div class="mono muted">${esc(s.seal.fingerprint)}</div>
+      <div class="row"><span style="color:${s.seal.selfSigned ? 'var(--warn)' : 'var(--ok)'}">${icon(s.seal.selfSigned ? 'bell' : 'okcircle')}</span><div><b>Document seal:</b> ${esc(s.seal.subject)} · ${esc(s.seal.source)} · valid to ${fmtDate(s.seal.validTo, false)}<div class="mono muted">${esc(s.seal.fingerprint)}</div>
         ${s.seal.selfSigned ? '<div class="muted">Seals detect tampering, but PDF readers show "issuer unknown". For trusted seals set SEAL_P12_PATH to a certificate from a CA or qualified trust service provider.</div>' : ''}</div></div>
-      <div class="row"><span style="color:#15803d">${icon('okcircle')}</span><div><b>Audit trail:</b> SHA-256 hash chain, append-only (database triggers block edits)</div></div>
-      <div class="row"><span style="color:#15803d">${icon('okcircle')}</span><div><b>Web protection:</b> strict CSP, HSTS (with HTTPS), rate limits, account lockout after 5 failed sign-ins, ${s.sessions} active session(s)</div></div>
+      <div class="row"><span style="color:var(--ok)">${icon('okcircle')}</span><div><b>Audit trail:</b> SHA-256 hash chain, append-only (database triggers block edits)</div></div>
+      <div class="row"><span style="color:var(--ok)">${icon('okcircle')}</span><div><b>Web protection:</b> strict CSP, HSTS (with HTTPS), rate limits, account lockout after 5 failed sign-ins, ${s.sessions} active session(s)</div></div>
     </div></div>
     <div class="card"><div class="card-h"><h2>Policies</h2></div><form class="card-b stack" id="pol" style="max-width:560px">
       <label class="check"><input type="checkbox" name="enforce_compliance" ${p.enforce_compliance === '1' ? 'checked' : ''}> Block sending when country rules or the risk policy aren't met</label>
